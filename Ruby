@@ -1,0 +1,50 @@
+# ==========================================================
+# Controlador de Sistema Óptico - Avance 3
+# Lógica de gestión para iluminación inteligente
+# ==========================================================
+
+class ControladorDomotico
+  attr_accessor :umbral, :historial_lecturas
+
+  def initialize(umbral_config = 400)
+    @umbral = umbral_config
+    @historial_lecturas = []
+    @estado_luces = false
+  end
+
+  def procesar_lectura(valor_ldr)
+    @historial_lecturas << valor_ldr
+    
+    # Lógica de decisión
+    if valor_ldr < @umbral
+      activar_iluminacion(true)
+    elsif valor_ldr > (@umbral + 50)
+      activar_iluminacion(false)
+    end
+    
+    mostrar_estado(valor_ldr)
+  end
+
+  private
+
+  def activar_iluminacion(estado)
+    @estado_luces = estado
+  end
+
+  def mostrar_estado(actual)
+    status = @estado_luces ? "ON 💡" : "OFF 🌑"
+    puts "Nivel de luz: #{actual.to_s.ljust(4)} | Estado del Sistema: #{status}"
+  end
+end
+
+# --- Simulación del Sistema ---
+puts "--- Iniciando Monitoreo Óptico (Ruby) ---"
+sistema = ControladorDomotico.new(450)
+
+# Simulación de transcurso del día (de luz a oscuridad)
+[800, 600, 440, 300, 250, 500].each do |lectura|
+  sistema.procesar_lectura(lectura)
+  sleep(0.5) # Pausa dramática para la simulación
+end
+
+puts "--- Registro completado ---"
