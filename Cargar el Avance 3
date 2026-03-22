@@ -1,0 +1,8 @@
+# Añadir todos los archivos nuevos (script y docs)
+git add .
+
+# Confirmar los cambios con un mensaje descriptivo
+git commit -m "Avance 3: Integración de control lumínico y sensores ópticos"
+
+# Subir los archivos a la nube
+git push -u origin main
