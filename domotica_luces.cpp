@@ -1,35 +1,61 @@
-#include <iostream>
+import Foundation
 
-class SistemaIluminacion {
-private:
-    bool estadoLuces;
-    int umbralLuz;
+// ==========================================================
+// Avance 3: Módulo de Control Lumínico Inteligente
+// Implementación en Swift para Sistemas de Domótica
+// ==========================================================
 
-public:
-    SistemaIluminacion(int umbral) : umbralLuz(umbral), estadoLuces(false) {}
+struct ControladorOptico {
+    let umbralReferencia: Int
+    private(set) var lucesActivas: Bool = false
+    private var historial: [Int] = []
+    private let capacidadHistorial = 10
 
-    void procesarSensor(int lecturaLDR) {
-        // Si la luz ambiental es menor al umbral, encender luces
-        if (lecturaLDR < umbralLuz && !estadoLuces) {
-            estadoLuces = true;
-            std::cout << "[DOMÓTICA] Luz ambiental baja (" << lecturaLDR << "). Encendiendo luces..." << std::endl;
-        } 
-        else if (lecturaLDR >= umbralLuz && estadoLuces) {
-            estadoLuces = false;
-            std::cout << "[DOMÓTICA] Luz ambiental suficiente (" << lecturaLDR << "). Apagando luces..." << std::endl;
+    init(umbral: Int) {
+        self.umbralReferencia = umbral
+    }
+
+    mutating func procesarLectura(_ valorLDR: Int) {
+        // Mantener el historial optimizado
+        if historial.count >= capacidadHistorial {
+            historial.removeFirst()
         }
-    }
-};
+        historial.append(valorLDR)
 
-int main() {
-    SistemaIluminacion miCasa(400); // Umbral de 400 unidades
-    
-    // Simulación de lecturas de sensor
-    int lecturas[] = {800, 600, 300, 200, 500};
-    
-    for (int l : lecturas) {
-        miCasa.procesarSensor(l);
+        // Lógica de control con histéresis (Swift Style)
+        switch valorLDR {
+        case ..<umbralReferencia where !lucesActivas:
+            actualizarEstado(true)
+        case (umbralReferencia + 80)... where lucesActivas:
+            actualizarEstado(false)
+        default:
+            break
+        }
+        
+        mostrarReporte(actual: valorLDR)
     }
 
-    return 0;
+    private mutating func actualizarEstado(_ nuevoEstado: Bool) {
+        lucesActivas = nuevoEstado
+        let mensaje = nuevoEstado ? "ENCENDIDO 💡" : "APAGADO 🌑"
+        print("\n[ACTUADOR] Cambio de estado detectado: \(mensaje)")
+    }
+
+    func mostrarReporte(actual: Int) {
+        let promedio = Double(historial.reduce(0, +)) / Double(historial.count)
+        print("Lectura Actual: \(actual) | Promedio: \(String(format: "%.1f", promedio)) | Sistema: \(lucesActivas ? "Activo" : "Inactivo")")
+    }
 }
+
+// --- Simulación del Ciclo de Monitoreo ---
+print("--- Iniciando Servicio de Óptica (Swift) ---")
+var miSistema = ControladorOptico(umbral: 420)
+
+let lecturasSimuladas = [850, 600, 400, 380, 250, 500, 700, 900]
+
+for lectura in lecturasSimuladas {
+    miSistema.procesarLectura(lectura)
+    Thread.sleep(forTimeInterval: 0.6)
+}
+
+print("\n--- Monitoreo Finalizado ---")
