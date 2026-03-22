@@ -1,0 +1,8 @@
+# Inicializar el repositorio local
+git init
+
+# Agregar el enlace de tu repositorio (reemplaza con tu URL real)
+git remote add origin https://github.com/tu-usuario/Control-y-Procesamiento-Digital-UV.git
+
+# Crear y cambiar a la rama principal
+git branch -M main
